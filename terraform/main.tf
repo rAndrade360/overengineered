@@ -7,6 +7,14 @@ resource "docker_image" "mongo" {
   keep_locally = false
 }
 
+resource "docker_image" "api" {
+  name = "api"
+  build {
+    context = "${path.module}/../"
+    tag = [ "api:latest" ]
+  }
+}
+
 resource "docker_volume" "mongo_volume" {
   name = "mongo_volume"
 }
@@ -101,6 +109,22 @@ resource "docker_container" "mongo-init" {
     name = docker_network.mongo-cluster.name
   }
   
-  restart = "no"
+  restart = "on-failure"
   command = [ "mongosh", "--host", "mongo-test:27017", "--eval",  "'rs.initiate({_id:'repl1',members:[{_id:0,host:'mongo-test:27017'}, {_id:1,host:'mongo-repl1:27017'},{_id:2,host:'mongo-repl2:27017'}]}); rs.status()'" ]
+}
+
+resource "docker_container" "api" {
+  name = "api"
+  image = docker_image.api.image_id
+  depends_on = [ docker_container.mongo, docker_container.mongo-repl1, docker_container.mongo-repl2 ]
+  networks_advanced {
+    name = docker_network.mongo-cluster.name
+  }
+
+  ports {
+    internal = 8090
+    external = 8090
+  }
+
+  restart = "always"
 }

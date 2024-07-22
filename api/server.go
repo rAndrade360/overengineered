@@ -10,15 +10,16 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 func StartServer() {
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://localhost:27017/?readPreference=primary&directConnection=true&ssl=false"))
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://mongo-test:27017,mongo-repl1:27017,mongo-repl2:27017/?replicaSet=repl1&readPreference=primary&ssl=false"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = client.Ping(context.Background(), nil)
+	err = client.Ping(context.Background(), readpref.PrimaryPreferred())
 	if err != nil {
 		log.Fatal(err)
 	}
