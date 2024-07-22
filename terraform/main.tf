@@ -37,6 +37,14 @@ resource "docker_container" "mongo" {
     host_path = "${path.cwd}/mongo/data/db"
   }
 
+  healthcheck {
+    test = [ "CMD", "echo", "\"try { rs.status() } catch (err) { rs.initiate({_id:'repl1',members:[{_id:0,host:'mongo-repl1:27017',priority:0.5},{_id:1,host:'mongo-repl2:27017',priority:0.5}]}) }\"", "|", "mongosh", "--port", "27017", "--quiet" ]
+    interval = "5s"
+    timeout = "30s"
+    start_period = "0s"
+    retries = 30
+  }
+
   networks_advanced {
     name = docker_network.mongo-cluster.name
   }
