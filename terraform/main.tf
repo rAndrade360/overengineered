@@ -91,3 +91,16 @@ resource "docker_container" "mongo-repl2" {
   
   command = [ "mongod", "--replSet", "repl1" ]
 }
+
+resource "docker_container" "mongo-init" {
+  image = docker_image.mongo.image_id
+  name = "mongo-init"
+  depends_on = [ docker_container.mongo, docker_container.mongo-repl1, docker_container.mongo-repl2 ]
+
+  networks_advanced {
+    name = docker_network.mongo-cluster.name
+  }
+  
+  restart = "no"
+  command = [ "mongosh", "--host", "mongo-test:27017", "--eval",  "'rs.initiate({_id:'repl1',members:[{_id:0,host:'mongo-test:27017'}, {_id:1,host:'mongo-repl1:27017'},{_id:2,host:'mongo-repl2:27017'}]}); rs.status()'" ]
+}
