@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 	"terraform-mongodb-pratical-example/api/controllers"
 	"terraform-mongodb-pratical-example/repositories"
 	"terraform-mongodb-pratical-example/services"
@@ -14,7 +15,7 @@ import (
 )
 
 func StartServer() {
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://mongo-test:27017,mongo-repl1:27017,mongo-repl2:27017/?replicaSet=repl1&readPreference=primary&ssl=false"))
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(os.Getenv("MONGO_URL")))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -37,5 +38,5 @@ func StartServer() {
 
 	mux.HandleFunc("POST /players", playercontroller.Save)
 
-	http.ListenAndServe(":8090", mux)
+	http.ListenAndServe(":"+os.Getenv("API_PORT"), mux)
 }

@@ -4,7 +4,6 @@ provider "docker" {
 
 resource "docker_image" "mongo" {
   name = "mongo:latest"
-  keep_locally = false
 }
 
 resource "docker_image" "api" {
@@ -120,6 +119,8 @@ resource "docker_container" "api" {
   networks_advanced {
     name = docker_network.mongo-cluster.name
   }
+
+  env = toset([for k, v in var.api_envs : "${k}=${v}"])
 
   ports {
     internal = 8090
