@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"terraform-mongodb-pratical-example/domain"
 	"terraform-mongodb-pratical-example/services"
 )
@@ -53,8 +54,20 @@ func (pc *PlayerController) Save(w http.ResponseWriter, r *http.Request) {
 }
 
 func (pc *PlayerController) Get(w http.ResponseWriter, r *http.Request) {
+	pageStr := r.URL.Query().Get("page")
+	perPageStr := r.URL.Query().Get("per_page")
 
-	players, err := pc.Service.GetPlayers(context.Background())
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		page = 1
+	}
+
+	perPage, err := strconv.Atoi(perPageStr)
+	if err != nil {
+		perPage = 10
+	}
+
+	players, err := pc.Service.GetPlayers(context.Background(), page, perPage)
 	if err != nil {
 		w.Write([]byte("Internal Server Error"))
 		w.WriteHeader(500)
