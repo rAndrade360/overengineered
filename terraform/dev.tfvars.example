@@ -1,0 +1,5 @@
+docker_host = "/var/run/docker.sock"
+api_envs = {
+  "MONGO_URL": "mongodb://mongo-test:27017,mongo-repl1:27017,mongo-repl2:27017/?replicaSet=repl1&readPreference=primary&ssl=false",
+  "API_PORT": "8090"
+}

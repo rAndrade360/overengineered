@@ -45,7 +45,7 @@ resource "docker_container" "mongo" {
   }
 
   healthcheck {
-    test = [ "CMD", "echo", "\"try { rs.status() } catch (err) { rs.initiate({_id:'repl1',members:[{_id:0,host:'mongo-repl1:27017',priority:0.5},{_id:1,host:'mongo-repl2:27017',priority:0.5}]}) }\"", "|", "mongosh", "--port", "27017", "--quiet" ]
+    test = [ "CMD", "echo", "\"try { rs.status() } catch (err) { rs.initiate({_id:'repl1',members:[{_id:0,host:'mongo-test:27017'}, {_id:1,host:'mongo-repl1:27017'},{_id:2,host:'mongo-repl2:27017'}]}) }\"", "|", "mongosh", "--port", "27017", "--quiet" ]
     interval = "5s"
     timeout = "30s"
     start_period = "0s"
@@ -109,7 +109,7 @@ resource "docker_container" "mongo-init" {
   }
   
   restart = "on-failure"
-  command = [ "mongosh", "--host", "mongo-test:27017", "--eval",  "'rs.initiate({_id:'repl1',members:[{_id:0,host:'mongo-test:27017'}, {_id:1,host:'mongo-repl1:27017'},{_id:2,host:'mongo-repl2:27017'}]}); rs.status()'" ]
+  command = [ "mongosh", "--host", "mongo-test:27017", "--eval",  "'try{ rs.status(); } catch(err){ rs.initiate({_id:'repl1',members:[{_id:0,host:'mongo-test:27017'}, {_id:1,host:'mongo-repl1:27017'},{_id:2,host:'mongo-repl2:27017'}]})}; rs.status()'" ]
 }
 
 resource "docker_container" "api" {
