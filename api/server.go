@@ -37,6 +37,7 @@ func StartServer() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /players", playercontroller.Save)
+	mux.HandleFunc("GET /players", playercontroller.Get)
 
 	http.ListenAndServe(":"+os.Getenv("API_PORT"), mux)
 }

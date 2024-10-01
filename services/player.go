@@ -13,3 +13,7 @@ type PlayerService struct {
 func (s *PlayerService) SavePlayer(ctx context.Context, p *domain.Player) error {
 	return s.Repository.SavePlayer(ctx, p)
 }
+
+func (s *PlayerService) GetPlayers(ctx context.Context) ([]domain.Player, error) {
+	return s.Repository.GetPlayers(ctx)
+}

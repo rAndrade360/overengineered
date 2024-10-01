@@ -51,3 +51,24 @@ func (pc *PlayerController) Save(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(b)
 }
+
+func (pc *PlayerController) Get(w http.ResponseWriter, r *http.Request) {
+
+	players, err := pc.Service.GetPlayers(context.Background())
+	if err != nil {
+		w.Write([]byte("Internal Server Error"))
+		w.WriteHeader(500)
+		log.Println("Err: ", err)
+		return
+	}
+
+	b, err := json.Marshal(players)
+	if err != nil {
+		w.Write([]byte("Internal Server Error"))
+		w.WriteHeader(500)
+		log.Println("Err: ", err)
+		return
+	}
+
+	w.Write(b)
+}
